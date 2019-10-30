@@ -33,14 +33,14 @@ class MemeGenerator extends React.Component {
                    the state in MemeGeneratorWrapper when we 
                    update the text
     */
+   let textBoxList = [];
+   if (this.props.currentMeme != null) {
+      for (let i = 0; i < this.props.currentMeme.box_count; i++) {
+        textBoxList.push(<MemeTextBox id="box1" index={i} handleMemeText={this.props.handleInput}/>);
+      }
+   }
 
-    return (
-      <div>
-        <MemeTextBox id="box1" index={1} handleMemeText={this.props.handleInput}/>
-        <MemeTextBox id="box2" index={2} handleMemeText={this.props.handleInput}/>
-        <MemeTextBox id="box3" index={3} handleMemeText={this.props.handleInput}/>
-      </div>
-    );   
+   return textBoxList;  
   }
 
   render() {

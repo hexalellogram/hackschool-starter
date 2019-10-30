@@ -11,9 +11,9 @@ class MemeTextBox extends React.Component {
   */
   render() {
     return (
-      <div className = "asdf">
-        <p>Text Box {this.props.index}</p>
-        <input type="text" onClick={this.props.handleMemeText}/>
+      <div>
+        <h2>Text Box {this.props.index + 1}</h2>
+        <textarea onChange={this.props.handleMemeText}></textarea>
       </div>
     );
   }
