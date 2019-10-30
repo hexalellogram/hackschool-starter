@@ -10,8 +10,14 @@ class MemeTextBox extends React.Component {
                                  update the text
   */
   render() {
-    return null;
+    return (
+      <div className = "asdf">
+        <p>Text Box {this.props.index}</p>
+        <input type="text" onClick={this.props.handleMemeText}/>
+      </div>
+    );
   }
+
 }
 
 export default MemeTextBox;
