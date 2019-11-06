@@ -28,7 +28,8 @@ class MemeGenerator extends React.Component {
   createTextBoxes = () => {
     /* 
         TODO: create a list of text boxes for the user to enter text into
-            Props: currentMeme, an object containing fields
+            Props: currentMeme, an object containing fields about the current meme.
+                                Use the box_count field for this function.
                    handleMemeText, a function that updates 
                    the state in MemeGeneratorWrapper when we 
                    update the text
