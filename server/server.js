@@ -2,12 +2,53 @@ const axios = require('axios');
 const express = require('express');
 const http = require('http');
 const bodyParser = require('body-parser');
-const qs = require('qs')
+const qs = require('qs');
+const mongo = require('mongodb');
+const config = require("./config.json");
+
+
 const app = express();
 const server = http.createServer(app);
+const mongoClient = mongo.MongoClient;
 
+// Setting up our mongo database
+const dbUrl = "mongodb://localhost:27017/memedb";
+const dbOptions = {
+    useNewUrlParser: true,
+    useUnifiedTopology:true
+};
 
-const config = require("./config.json");
+let database;
+let memeCollection;
+mongoClient.connect(dbUrl, dbOptions, (err, db) => {
+    if(err) throw err;
+    console.log("Database created");
+
+    const specificDatabase = db.db("memedb");
+    specificDatabase.createCollection("memes", (error, dbb) => {
+        if (error) throw error;
+        console.log("Meme collection created.");
+    });
+
+    database = specificDatabase;
+    memeCollection = specificDatabase.collection("memes");
+});
+
+function sendToMemeDatabase(fields) {
+    memeCollection.insertOne(fields, (err, res) => {
+        if (err) throw err;
+    });
+}
+
+app.post("/test", (req, res) => {
+    sendToMemeDatabase({
+        name: "Bryce",
+        age: 18
+    }, (err, res) => {
+        if (err) throw err;
+    });
+    res.send("ok")
+});
 
 // Server will always find an open port.
 const port = process.env.PORT || 3001;
@@ -52,7 +93,7 @@ app.get('/bestmeme', (req, res) => {
  * in the instance variable, meme.
  */
 let meme;
-app.post('/upload', (req, res) => {
+app.post('/uploadVinay', (req, res) => {
     // HINT: First step is to understand the imgflip API and make an object
     // that will be inputted in the caption_image endpoint from imgflip.
     //console.log(req.body.template_id)
@@ -69,12 +110,63 @@ app.post('/upload', (req, res) => {
     // Source: https://flaviocopes.com/axios-urlencoded/
     final_url = "";
     console.log(qs.stringify(params));
-    console.log(JSON.stringify(params));
     axios.post(url, qs.stringify(params)).then(response => {
-        final_url = response.data['data']['url']
+        final_url = response.data['data']['url'];
         //console.log(final_url);
         res.send(final_url);
     });    
     meme = final_url;
 });
 
+app.post('/upload', (req, res) => {
+    // HINT: First step is to understand the imgflip API and make an object
+    // that will be inputted in the caption_image endpoint from imgflip.
+    //console.log(req.body.template_id)
+
+    const apiUrl = 'https://api.imgflip.com/caption_image';
+    const params = req.body;
+    const apiData = {
+        template_id: params.template_id,
+        username: config.username,
+        password: config.password,
+        text0: "yes",
+        text1: "no",
+
+    };
+
+    axios({
+        method: 'post',
+        url: apiUrl,
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        data: qs.stringify(apiData)
+    }).then(response => {
+        if(response.data.success) {
+            meme = response.data.data.url;
+            res.status(200).send();
+        } else {
+            res.status(404).send();
+        }
+    });
+       
+});
+
+// TODO: Create an endpoint called /getmemes that sends the meme data from the database
+// to the response. We want to use the find operation to retreive all of the documents 
+// from the database. Then, we want to send our data to the response as string using
+// JSON.stringify(data).
+app.get('/getmemes', (req, res) => {
+    // What should our query be if we want to retrieve everything in our database?
+    let query = {};
+    let myResult = memeCollection.find(query);
+    // How do we use the find operation. We also want to make the data into an array so
+    // consider using the .toArray function. 
+    // (some collection).toArray((err, result) => {
+    //    result represents the array
+    // })
+
+    myResult.toArray((err, result) => {
+        res.send(JSON.stringify(result));
+    });
+  });
