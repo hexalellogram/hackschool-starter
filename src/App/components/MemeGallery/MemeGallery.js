@@ -1,22 +1,21 @@
 import React from 'react';
 import MemeModel from './MemeModel';
+import Axios from 'axios';
 require('../../style/meme.css');
 
 /** Component that handles the overall meme gallery page.*/
 class MemeGallery extends React.Component {
   constructor() {
     super();
-    fetch('/getmemes')
-      .then(response => response.json())
-      .then(data => {
-        this.setState({
-          memeArray: data,
-        })
-      });
-
-    this.state = {
-      memeArray: null,
-    };
+    Axios.get('/getmemes')
+    .then(response => {
+      this.setState({
+        memeArray: response.data,
+      })
+    });
+    // this.state = {
+    //   memeArray: null,
+    // };
   }
 
   render() {
