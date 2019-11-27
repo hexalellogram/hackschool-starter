@@ -40,15 +40,18 @@ function sendToMemeDatabase(fields) {
     });
 }
 
-app.post("/test", (req, res) => {
-    sendToMemeDatabase({
-        name: "Bryce",
-        age: 18
-    }, (err, res) => {
-        if (err) throw err;
-    });
-    res.send("ok")
-});
+function populateMemeFields(photoURL, topText, bottomText, user){
+    let memeobj = {
+        photoURL: photoURL,
+        topText: topText,
+        bottomText: bottomText,
+        user: user,
+        likes: 0,
+        isBolded: false
+    };
+
+    return memeobj;
+}
 
 // Server will always find an open port.
 const port = process.env.PORT || 3001;
@@ -81,43 +84,6 @@ app.get('/bestmeme', (req, res) => {
     });
 });
 
-/*
- * TODO: Create a POST request that will have the JSON body formatted like
- * {
- *   template_id: [id],
- *   photoURL: [url of image],
- *   memeTexts: [array of text for the meme],
- *   user: [string of your name]
- * }
- * and creates the meme image. Once the image has been created, store it
- * in the instance variable, meme.
- */
-let meme;
-app.post('/uploadVinay', (req, res) => {
-    // HINT: First step is to understand the imgflip API and make an object
-    // that will be inputted in the caption_image endpoint from imgflip.
-    //console.log(req.body.template_id)
-
-    params = {
-        template_id: req.query.template_id,
-        username: config.username,
-        password: config.password,
-        text0: req.query.memeTexts[0],
-        text1: req.query.memeTexts[1],
-    };
-    
-    const url = 'https://api.imgflip.com/caption_image';
-    // Source: https://flaviocopes.com/axios-urlencoded/
-    final_url = "";
-    console.log(qs.stringify(params));
-    axios.post(url, qs.stringify(params)).then(response => {
-        final_url = response.data['data']['url'];
-        //console.log(final_url);
-        res.send(final_url);
-    });    
-    meme = final_url;
-});
-
 app.post('/upload', (req, res) => {
     // HINT: First step is to understand the imgflip API and make an object
     // that will be inputted in the caption_image endpoint from imgflip.
@@ -129,8 +95,9 @@ app.post('/upload', (req, res) => {
         template_id: params.template_id,
         username: config.username,
         password: config.password,
-        text0: "yes",
-        text1: "no",
+        boxes: params.memeTexts.map((text) => {
+            return { "text": text };
+        })
 
     };
 
@@ -143,12 +110,22 @@ app.post('/upload', (req, res) => {
         data: qs.stringify(apiData)
     }).then(response => {
         if(response.data.success) {
-            meme = response.data.data.url;
-            res.status(200).send();
+            const fields = populateMemeFields(response.data.data.url, params.topText, params.bottomText, params.user);
+            sendToMemeDatabase(fields);
+            res.status(200).send({
+                success: true,
+                url: response.data.data.url
+            });
         } else {
-            res.status(404).send();
+            console.log("Unsuccessful call to the imgflip API");
+            console.log(response.data.error_message);
+            res.status(404).send({
+                success: false,
+                error_message: response.data.error_message
+            });
         }
-    });
+    })
+    .catch( (err) => { throw err; });
        
 });
 
@@ -167,6 +144,7 @@ app.get('/getmemes', (req, res) => {
     // })
 
     myResult.toArray((err, result) => {
+        if(err) throw err;
         res.send(JSON.stringify(result));
     });
   });
