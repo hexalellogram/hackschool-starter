@@ -145,6 +145,7 @@ app.get('/getmemes', (req, res) => {
     // What should our query be if we want to retrieve everything in our database?
     let query = {};
     let myResult = memeCollection.find(query);
+    console.log(myResult);
     // How do we use the find operation. We also want to make the data into an array so
     // consider using the .toArray function. 
     // (some collection).toArray((err, result) => {
