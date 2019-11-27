@@ -13,9 +13,9 @@ class MemeGallery extends React.Component {
         memeArray: response.data,
       })
     });
-    // this.state = {
-    //   memeArray: null,
-    // };
+    this.state = {
+      memeArray: null,
+    };
   }
 
   render() {
