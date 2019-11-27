@@ -19,6 +19,7 @@ class MemeGallery extends React.Component {
   }
 
   render() {
+    console.log(this.state.memeArray);
     const ourFavorites = this.state.memeArray ? this.state.memeArray.map ((meme) =>
       <MemeModel
         key={meme._id}
