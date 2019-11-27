@@ -151,7 +151,7 @@ app.get('/getmemes', (req, res) => {
     //    result represents the array
     // })
 
-    myResult.toArray((err, result) => {
+    myResult.toArray(function(err, result) {
         if(err) throw err;
         res.send(JSON.stringify(result));
     });
