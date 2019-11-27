@@ -13,7 +13,7 @@ const mongoClient = mongo.MongoClient;
 
 
 // Setting up our mongo database
-const dbUrl = process.env.MONGODB_URI;
+const dbUrl = "mongodb+srv://dbUser:7TMPtkdYapVVvKrQWfk%25cR@hexalellogramcluster-zvopp.azure.mongodb.net/test?retryWrites=true&w=majority";
 const dbOptions = {
     useNewUrlParser: true,
     useUnifiedTopology:true
@@ -76,10 +76,6 @@ app.get('/doggo', (req, res) => {
     axios.get(doggoUrl).then(response => {
         res.send(response.data.url);
     });
-});
-
-app.get('*', function(req,res) {
-    res.sendFile(path.join(__dirname, 'build', 'index.html'));
 });
 
 
@@ -152,6 +148,7 @@ app.get('/getmemes', (req, res) => {
     //    result represents the array
     // })
 
+
     myResult.toArray(function(err, result) {
         if(err) throw err;
         console.log(result);
@@ -159,3 +156,6 @@ app.get('/getmemes', (req, res) => {
     });
   });
 
+app.get('*', function(req,res) {
+    res.sendFile(path.join(__dirname, 'build', 'index.html'));
+});
