@@ -1,6 +1,8 @@
 # Meme Generator
 Meme generator for teaching principles for creating web-apps.
 
+Unfortunately Heroku's free tier is going away which means this application will no longer function once it does.
+
 # Deployment
 1) npm install (both in server, and in the main dir)
 2) install MongoDB
